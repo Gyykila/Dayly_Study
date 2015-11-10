@@ -1,2 +1,2 @@
 # Dayly_Study
-where are somethings about how i eat Java
+There are somethings about how i eat Java
