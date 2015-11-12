@@ -1,0 +1,82 @@
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.InputStream;
+import java.io.OutputStream;
+
+public class ChangeFile {
+	public static String RootFile;
+	public static String RootFilePath;
+	public static String NewFilePath;
+	public static String RootFileName;
+	
+	public static void main(String[] args) {
+		String FileName = "E:\\APIword"+File.separator;
+		File file = new File(FileName);
+		long start = System.currentTimeMillis();
+		ListFile(file);
+		long end = System.currentTimeMillis();
+		System.out.print(end-start);
+	}
+
+	private static void ListFile(File file) {
+		if(file != null){
+			//判断是否是文件
+			if(file.isFile()){
+				ChangeFile(file);
+			}
+			//遍历所有文件
+			if(file.isDirectory()){			
+				File[] File = file.listFiles();
+				if(File!=null){
+					for(int i=0; i<File.length; i++){
+						ListFile(File[i]);
+					}
+				}
+			}
+		}
+		
+	}
+
+	private static void DeleteFile(File file) {
+		String filename = file.getName();
+		if(file.getName().substring(file.getName().lastIndexOf(".")+1).equals("java")){
+			file.delete();
+			System.out.println(filename+"已成功删除");
+		}
+		
+	}
+
+	private static void ChangeFile(File file) {
+		RootFile = file.getAbsolutePath();
+		//原文件所在目录
+		RootFilePath = RootFile.substring(0,RootFile.length()-file.getName().length());
+		//原文件名
+		RootFileName =  file.getName().substring(0,file.getName().length()-file.getName().substring(file.getName().lastIndexOf(".")).length());
+		File File = new File(RootFilePath+RootFileName+".doc");
+		if(!File.exists()){
+			try{
+				File.createNewFile();
+			}catch(Exception e){
+				e.printStackTrace();
+			}
+		try{
+			InputStream input = new FileInputStream(file);
+			OutputStream output = new FileOutputStream(File);
+			System.out.println("正在转换"+file.getName());
+			if(input != null && output != null){
+				int temp = 0;
+				while((temp = input.read()) != (-1)){
+					output.write(temp);
+				}
+			}
+			System.out.println("转换成功!");
+			input.close();
+			output.close();
+		}catch(Exception e){
+			e.printStackTrace();
+		}
+		}
+	}
+
+}
