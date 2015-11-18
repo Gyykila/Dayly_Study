@@ -1,0 +1,41 @@
+<%@ page language="java" import="java.sql.*" import="com.mysql.jdbc.Driver" contentType="text/html; charset=GB2312"
+    pageEncoding="GB2312"%>
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=GB2312">
+<title>Insert title here</title>
+</head>
+<body>
+	<%!
+		public static boolean flag = false;%>
+	<%	
+		boolean flag = false;
+		request.setCharacterEncoding("gb2312");
+		String userid = request.getParameter("id");
+		String pasw = request.getParameter("pasw");
+			Class.forName("com.mysql.jdbc.Driver");
+			//数据库账号密码改改，mydatabase是数据源
+			Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/mydatabase","root","");
+			String sql = "Select id,password from stu where id=? and password=?";
+			PreparedStatement ps = con.prepareStatement(sql);
+			ps.setString(1,userid);
+			ps.setString(2,pasw);
+			ResultSet rs = ps.executeQuery();
+			if(rs.next()){
+				flag = true;
+			}
+			ps.close();
+			con.close();
+			%>
+		<%
+			if(flag){%>
+			<jsp:forward page="test_target.jsp"/>
+			<%} //这是登录成功后跳转的页面%>
+		<%
+			if(!flag){%>
+			alert("请重新登陆");
+			<jsp:forward page="test_LoginSQL.jsp"/>
+			<%} %>
+</body>
+</html>
