@@ -1,0 +1,83 @@
+package servlets;
+
+
+import java.io.IOException;
+import java.sql.*;
+import java.util.ArrayList;
+
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+
+import com.mysql.jdbc.Connection;
+
+/**
+ * Servlet implementation class FindBook
+ */
+public class FindBook extends HttpServlet {
+	private static final long serialVersionUID = 1L;
+    public FindBook() {
+        super();
+    }
+
+	protected void doGet(HttpServletRequest request, HttpServletResponse response) 
+	throws ServletException, IOException{
+		this.doPost(request, response);
+	}
+
+	protected void doPost(HttpServletRequest request, HttpServletResponse response) 
+	throws ServletException, IOException{
+		String info = new String(request.getParameter("info"));
+		
+		try {
+			
+			FindBook(info, request, response);
+			
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}	
+	}
+
+	private void FindBook(String info, HttpServletRequest request, HttpServletResponse response) 
+	throws ClassNotFoundException, SQLException, ServletException, IOException{
+		// TODO Auto-generated method stub
+		
+		HttpSession session = request.getSession();
+		
+		ArrayList name = new ArrayList();
+		ArrayList id = new ArrayList();
+		ArrayList pri = new ArrayList();
+				//链接数据库
+		Class.forName("com.mysql.jdbc.Driver");
+		Connection con = (Connection) DriverManager.getConnection("jdbc:mysql://localhost:3306/mydatabase","root", "");
+		String sql = "select * from t_book where book_name like '%"+info+"%'";
+		Statement psta = con.createStatement();
+		ResultSet rs = psta.executeQuery(sql);
+		
+				if(rs != null){	
+					//如果用if(rs.next()) 结果集将会导致rs指针指向第一条记录 后续的while判断 无法获取rs中的第一条内容
+					while(rs.next()){
+						String book_id = rs.getString("BOOK_ID");
+						String book_name = rs.getString("BOOK_NAME");
+						String book_price = rs.getString("BOOK_PRICE");
+						name.add(book_name);
+						id.add(book_id);
+						pri.add(book_price);
+					}
+					session.setAttribute("name", name);
+					session.setAttribute("id", id);
+					session.setAttribute("pri", pri);
+					response.sendRedirect("/Servlet/Find_book.jsp");
+				}else{
+					response.sendRedirect("/Servlet/Find_book.jsp");
+				}
+				rs.close();
+				psta.close();
+				con.close();
+	}
+
+	}
